@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "cmake-build-debug/game.h"
 #include "cmake-build-debug/IO.h"
 
 #define MAX_LIMIT 50
@@ -11,51 +10,33 @@
 
 void printInitView();
 void printDefaultView(cardNode *head, int show);
+void gameLoop();
+void terminal();
+void printStartGame();
+
+char input[MAX_LIMIT];
+char instruction[3] = "";
+char variable[MAX_LIMIT] = "";
+char message[MAX_LIMIT] = "";
+char lastCommand[MAX_LIMIT] = "";
+char variableExists = 1;
+int check;
+char initBool = 0;
+char foundCommand = 0;
+int showFace = 0;
+
 int main() {
 
-    char input[MAX_LIMIT];
-    char instruction[3] = "";
-    char variable[MAX_LIMIT] = "";
-    char message[MAX_LIMIT] = "";
-    char lastCommand[MAX_LIMIT] = "";
-    char variableExists = 1;
-    int check;
-    char initBool = 0;
-    char foundCommand = 0;
-    int show = 0;
     while(1){
 
-        variableExists = 1;
-        variable[0] = '\0';
-        instruction[0] = '\0';
-        //puts("Setting up game, please choose a command...");
+
         if(!initBool){
             printInitView();
         }else {
-            printDefaultView(mainDeckHead, show);
-            show = 0;
+            printDefaultView(mainDeckHead, showFace);
+            showFace = 0;
         }
-
-
-        printf("LAST Command: %s\n", lastCommand);
-        printf("Message: %s\n", message);
-        printf("Input > ");
-        fgets(input, MAX_LIMIT, stdin);
-        input[strlen(input)-1] = '\0';
-        strcpy(lastCommand, input);
-        char * token = strtok(input, " ");
-        // loop through the string to extract all other tokens
-        if ( token != NULL) {
-            strcpy(instruction, token);
-            token = strtok(NULL, " ");
-            if (token != NULL){
-                strcpy(variable, token);
-            }
-
-        }
-        if(variable[0] == '\0'){
-            variableExists= 0;
-        }
+        terminal();
         printf("Instruction: %s, variable: %s\n", instruction, variable);
 
         if (strcmp(instruction, "LD") == 0){
@@ -77,7 +58,7 @@ int main() {
         }
         else if (strcmp(instruction, "SW") == 0){
             puts("Showing deck...");
-            show = 1;
+            showFace = 1;
         }
         else if (strcmp(instruction, "SI") == 0){
             if (variableExists){
@@ -86,17 +67,19 @@ int main() {
                 if (splitNum > 0 && splitNum < 52){
                     printf("Num: %d\n", splitNum);
                     puts("Shuffling split...");
-                    shufflesplit(mainDeckHead, splitNum);
+                    mainDeckHead = shufflesplit(mainDeckHead, splitNum);
                 }else{
                     puts("Please pick a number between 1 and 51");
                 }
 
             }else{
-                shufflesplit(mainDeckHead, 0);
+                mainDeckHead = shufflesplit(mainDeckHead, 0);
             }
         }
         else if (strcmp(instruction, "SR") == 0){
             puts("Shuffling...");
+            //mainDeckHead =
+            shuffleRandom(mainDeckHead);
         }
         else if (strcmp(instruction, "SD") == 0){
             puts("Saving deck...");
@@ -123,6 +106,54 @@ int main() {
 
     }
 }
+
+void gameLoop() {
+    printStartGame();
+    while(1){
+
+        terminal();
+
+
+
+
+
+        if (strcmp(input, "Q") == 0){
+            puts("Exiting game...");
+            return;
+        }
+    }
+
+
+}
+
+void terminal(){
+    variableExists = 1;
+    variable[0] = '\0';
+    instruction[0] = '\0';
+    //puts("Setting up game, please choose a command...");
+
+
+    printf("LAST Command: %s\n", lastCommand);
+    printf("Message: %s\n", message);
+    printf("Input > ");
+    fgets(input, MAX_LIMIT, stdin);
+    input[strlen(input)-1] = '\0';
+    strcpy(lastCommand, input);
+    char * token = strtok(input, " ");
+    // loop through the string to extract all other tokens
+    if ( token != NULL) {
+        strcpy(instruction, token);
+        token = strtok(NULL, " ");
+        if (token != NULL){
+            strcpy(variable, token);
+        }
+
+    }
+    if(variable[0] == '\0'){
+        variableExists= 0;
+    }
+}
+
 void printInitView(){
     printf("C1\tC2\tC3\tC4\tC6\tC7\n\n");
     printf("\t\t\t\t\t\t\t[]\tF1\n\n");
@@ -155,4 +186,8 @@ void printDefaultView(cardNode *head, int show){
         counter++;
     }
     puts("");
+}
+
+void printStartGame(){
+
 }
